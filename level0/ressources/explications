@@ -1,0 +1,12 @@
+Nous sommes en presence d'un binaire level0
+Lorsque l'on lance le binaire seul ce dernier segfault mais lorsque nous faisons ./level0 whatever le binaire nous retourne "No !"
+Utilisons gdb pour desassembler le main : 
+
+gdb ./level0
+disas main
+
+Nous remarquons la presence d'un appel a la fonction atoi et sur la ligne d'apres un cmp qui va comparer le retour de atoi avec la valeur hexadecimal $0x1a7 qui correspond a 423 en decimal.
+
+Relancons donc ./level0 423 :
+$
+cat /home/user/level1/.pass : 1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a

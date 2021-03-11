@@ -51,6 +51,7 @@ End of assembler dump.
 Qu'observons nous ? On voit dans la fonction main un appel a la fonction n avec un appel a la fonction fgets, a la fonction p et a la fonction system.
 La focntion p quant a elle fera un appel a la fonction printf. La faille devrait se trouver ici.
 Comme dans le level3, nous remarquons la presence d'une variable m a l'adresse 0x08049810 qui sera compare avec 0x1025544 = 16930116
+L'appel a la fonction system execute la commande /bin/cat /home/user/level5/.pass
 Essayons de la meme maniere que pour le niveau precedent : 
 python -c 'print("AAAA" + "%p" * 20)' > /tmp/level4
 ./level4 < /tmp/level4

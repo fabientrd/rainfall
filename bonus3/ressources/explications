@@ -82,7 +82,7 @@ Nous voyons un appel a execl avec comme arguement "/bin/sh"
 Afin d'arriver a cette execution de /bin/sh il faut ne pas prendre le jump a main+237
 A main+31 nous voyons un appel a fopen("/home/user/end/.pass", "r"). or n'ayant pas les droits de lecture sur ce fichier le buffer rempli par le fread en main+123 sera egal a "\0"
 Juste apres en main+144 nous voyons un appel a la fonction atoi qui va ensuite amener un autre fread puis a un strcmp.
-Il va donc falloir faire correspondre le buffer ainsi que le resultat du buffer qui sera rempli par le retour du atoi(avec[1])
+Il va donc falloir faire correspondre le buffer ainsi que le resultat du buffer qui sera rempli par le retour du atoi(av[1])
 Pour ce faire nous passons tout simplement un argument vide ce qui va placer un "\0" dans ce buffer et enfin executer execl("/bin/sh")
 
 --> bonus3@RainFall:~$ ./bonus3 ""

